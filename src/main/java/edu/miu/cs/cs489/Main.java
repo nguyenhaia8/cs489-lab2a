@@ -19,12 +19,12 @@ public class Main {
                 .sorted(Comparator.comparingDouble(Employee::getYearlySalary).reversed()
                         .thenComparing(Employee::getLastName))
                 .toList();
-        LocalDate testDate = LocalDate.parse("2025-03-31");
+        LocalDate testDate = LocalDate.now();
         List<Employee> quarterlyUpcomingEnrollees = getQuarterlyUpcomingEnrollees(employees, testDate);
         List<Employee> currentQuarterlyEnrollees = getCurrentQuarterlyEnrollees(employees, testDate);
 
         printAsJson("All Employees (with pension data if available)", allEmployeesSorted);
-        printAsJson("Quarterly Upcoming Enrollees", quarterlyUpcomingEnrollees);
+        printAsJson("Next Quarterly Upcoming Enrollees", quarterlyUpcomingEnrollees);
         printAsJson("Current Quarterly Enrollees", currentQuarterlyEnrollees);
     }
 
@@ -34,64 +34,56 @@ public class Main {
                         1L,
                         "Daniel",
                         "Agar",
-                        LocalDate.parse("2023-01-17"),
+                        LocalDate.parse("2025-08-17"),
                         105_945.50,
-                        new PensionPlan("EX1089", LocalDate.parse("2023-01-17"), 100.00)
+                        null
                 ),
                 new Employee(
                         2L,
-                        "Bernard",
+                        "Benard",
                         "Shaw",
-                        LocalDate.parse("2022-09-03"),
+                        LocalDate.parse("2025-02-03"),
                         197_750.00,
-                        null
+                        new PensionPlan("EX0089", LocalDate.parse("2026-02-03"), 450.00)
                 ),
                 new Employee(
                         3L,
                         "Carly",
-                        "Agar",
-                        LocalDate.parse("2014-05-16"),
+                        "Jones",
+                        LocalDate.parse("2024-05-16"),
                         842_000.75,
-                        new PensionPlan("SM2307", LocalDate.parse("2017-05-17"), 1_555.50)
+                        new PensionPlan("SM2307", LocalDate.parse("2025-05-17"), 1_555.50)
                 ),
                 new Employee(
                         4L,
                         "Wesley",
                         "Schneider",
-                        LocalDate.parse("2023-07-21"),
-                        74_500.00,
+                        LocalDate.parse("2025-04-30"),
+                        174_500.00,
                         null
                 ),
                 new Employee(
                         5L,
                         "Anna",
                         "Wiltord",
-                        LocalDate.parse("2023-03-15"),
-                        85_750.00,
+                        LocalDate.parse("2025-09-15"),
+                        185_750.00,
                         null
                 ),
                 new Employee(
                         6L,
                         "Yosef",
                         "Tesfalem",
-                        LocalDate.parse("2024-10-31"),
+                        LocalDate.parse("2025-07-31"),
                         100_000.00,
                         null
                 ),
                 new Employee(
                         7L,
-                        "Martha",
-                        "King",
-                        LocalDate.parse("2020-08-20"),
-                        120_500.00,
-                        new PensionPlan("Q12025-A1", LocalDate.parse("2025-02-10"), 450.00)
-                ),
-                new Employee(
-                        8L,
-                        "Leo",
-                        "Brown",
-                        LocalDate.parse("2022-05-10"),
-                        98_000.00,
+                        "Johnny",
+                        "Edwards",
+                        LocalDate.parse("2025-07-09"),
+                        95_500.00,
                         null
                 )
         );
@@ -102,7 +94,7 @@ public class Main {
         return employees.stream()
                 .filter(employee -> employee.getPensionPlan() == null)
                 .filter(employee -> {
-                    LocalDate qualificationDate = employee.getEmploymentDate().plusYears(3);
+                    LocalDate qualificationDate = employee.getEmploymentDate().plusYears(1);
                     return !qualificationDate.isBefore(nextQuarter.firstDay())
                             && !qualificationDate.isAfter(nextQuarter.lastDay());
                 })
@@ -114,11 +106,11 @@ public class Main {
     private static List<Employee> getCurrentQuarterlyEnrollees(List<Employee> employees, LocalDate currentDate) {
         QuarterRange currentQuarter = getCurrentQuarterDateRange(currentDate);
         return employees.stream()
-                .filter(employee -> employee.getPensionPlan() != null)
+                .filter(employee -> employee.getPensionPlan() == null)
                 .filter(employee -> {
-                    LocalDate enrollmentDate = employee.getPensionPlan().getEnrollmentDate();
-                    return !enrollmentDate.isBefore(currentQuarter.firstDay())
-                            && !enrollmentDate.isAfter(currentQuarter.lastDay());
+                    LocalDate qualificationDate = employee.getEmploymentDate().plusYears(1);
+                    return !qualificationDate.isBefore(currentQuarter.firstDay())
+                            && !qualificationDate.isAfter(currentQuarter.lastDay());
                 })
                 .sorted(Comparator.comparing(Employee::getEmploymentDate).reversed())
                 .toList();
